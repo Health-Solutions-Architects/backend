@@ -1,11 +1,12 @@
 from typing import Annotated
 
 from fastapi.params import Depends
+from sqlalchemy.orm import Session
 
 from src.database.database import SessionLocal
 
 
-def get_db():
+def get_db() -> Session:
     db = SessionLocal()
     try:
         yield db
@@ -13,4 +14,4 @@ def get_db():
         db.close()
 
 
-DatabaseSession = Annotated[SessionLocal, Depends(get_db)]
+DatabaseSession = Annotated[Session, Depends(get_db)]

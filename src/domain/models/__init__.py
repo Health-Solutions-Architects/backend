@@ -1,1 +1,1 @@
-from src.domain.models.UserModel import UserModel
+from src.domain.models.user_model import UserModel
