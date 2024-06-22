@@ -3,6 +3,25 @@ networks:
     name: services-network
 
 services:
+
+  postgresql:
+    image: bitnami/postgresql:latest
+    container_name: postgresql
+    restart: always
+    privileged: true
+    user: root
+    environment:
+      - POSTGRESQL_USERNAME=hackathon
+      - POSTGRESQL_PASSWORD=hackathon
+      - POSTGRESQL_DATABASE=hackathon
+    volumes:
+      - ./docker_data/postgresql:/bitnami/postgresql
+    ports:
+      - '5432:5432'
+    networks:
+      - services-network
+
+
   redis:
     image: docker.io/bitnami/redis:7.2
     container_name: redis
@@ -17,35 +36,6 @@ services:
     networks:
       - services-network
 
-
-  grafana:
-    image: grafana/grafana
-    container_name: grafana
-    restart: always
-    privileged: true
-    user: root
-    ports:
-      - '3000:3000'
-    volumes:
-      - ./docker_data/grafana:/var/lib/grafana
-    networks:
-      - services-network
-
-  proxy_manager:
-    image: 'docker.io/jc21/nginx-proxy-manager:latest'
-    container_name: proxymanager
-    restart: always
-    privileged: true
-    user: root
-    ports:
-      - '80:80'
-      - '81:81'
-      - '443:443'
-    volumes:
-      - ./docker_data/proxy/data:/data
-      - ./docker_data/proxy/letsencrypt:/etc/letsencrypt
-    networks:
-      - services-network
 
   rabbitmq:
     image: bitnami/rabbitmq:latest
@@ -65,52 +55,3 @@ services:
     networks:
       - services-network
 
-  portainer:
-    image: portainer/portainer-ce:latest
-    container_name: portainer
-    privileged: true
-    ports:
-      - '8000:8000'
-      - '9443:9443'
-      - '9000:9000'
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./docker_data/portainer:/data
-    networks:
-      - services-network
-
-  apidash:
-    image: gamboasolutions/master:apir7vote
-    container_name: apidash
-    privileged: true
-    user: root
-    ports:
-      - '5000:5001'
-    environment:
-      - REDIS_HOST=redis
-    networks:
-      - services-network
-
-  frontend:
-    image: gamboasolutions/master:frontend
-    container_name: frontend
-    privileged: true
-    user: root
-    ports:
-      - '8081:3001'
-    networks:
-      - services-network
-
-  wsapi:
-    image: gamboasolutions/master:ws7vote
-    container_name: wsapi
-    privileged: true
-    user: root
-    ports:
-      - '6001:6000'
-    env_file:
-      - path: env.local
-    environment:
-      - REDIS_HOST=redis
-    networks:
-      - services-network

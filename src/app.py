@@ -1,17 +1,12 @@
 import contextlib
 
 from fastapi import FastAPI
-
-from src.routes import auth
+from starlette.middleware.cors import CORSMiddleware
 
 
 @contextlib.asynccontextmanager
 async def lifespan(_app: FastAPI):
-    print('Iniciando aplicação...')
-    _app.config = dict(host="0.0.0.0", port=8080)
-    yield
-    _app.config.clear()
-    print('Finalizando aplicação...')
+    yield {'config': dict(host="0.0.0.0", port=8080)}
 
 
 app = FastAPI(
@@ -21,4 +16,11 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-app.include_router(auth.router, prefix='/api')
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=['*'],
+    allow_headers=['*'],
+)
+
