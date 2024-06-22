@@ -42,34 +42,9 @@ def verifica_cpf(message):
     verificado = cpfFunctions.verificaCpf(message.text)
     if verificado:
         bot.reply_to(message, 'CPF verificado com sucesso. Por favor, informe seu email:')
-        bot.register_next_step_handler(message, captura_email)
+        bot.register_next_step_handler(message, cpfFunctions.captura_email)
     else:
         bot.reply_to(message, 'CPF não encontrado. Por favor, verifique e tente novamente.')
-
-def captura_email(message):
-    email = message.text
-    # Aqui você pode adicionar a lógica para validar o email, se necessário
-    bot.reply_to(message, 'Email registrado. Agora, por favor, informe seu nome:')
-    bot.register_next_step_handler(message, captura_nome, email)
-
-def captura_nome(message, email):
-    nome = message.text
-    bot.reply_to(message, 'Nome registrado. Agora, por favor, informe sua idade:')
-    bot.register_next_step_handler(message, captura_idade, email, nome)
-
-def captura_idade(message, email, nome):
-    idade = message.text
-    if idade.isdigit():
-        bot.reply_to(message, 'Idade registrada. Agora, por favor, informe os sintomas que está sentindo:')
-        bot.register_next_step_handler(message, captura_sintomas, email, nome, idade)
-    else:
-        bot.reply_to(message, 'Idade inválida. Por favor, informe sua idade em números:')
-        bot.register_next_step_handler(message, captura_idade, email, nome)
-
-def captura_sintomas(message, email, nome, idade):
-    sintomas = message.text
-    # Aqui você pode adicionar a lógica para processar as informações capturadas
-    bot.reply_to(message, f'Registro completo:\nEmail: {email}\nNome: {nome}\nIdade: {idade}\nSintomas: {sintomas}')
 
 
 @bot.message_handler(func=lambda message: True)
