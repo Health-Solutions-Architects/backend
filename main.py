@@ -17,9 +17,19 @@ def inicio(message):
     markup.add(quest_sim, quest_nao)
     bot.send_message(message.chat.id, 'Você possui cadastro?', reply_markup=markup)
 
+@bot.callback_query_handler(func=lambda call: call.data == 'prefix:nao-possui-cadastro')
+def naoPossuiCadastro(message):
+    bot.send_message(message.message.chat.id, 'Informe seu CPF')
+    bot.register_next_step_handler(message.message, cpfFunctions.captura_email, bot)
+
+@bot.callback_query_handler(func=lambda call: call.data == 'prefix:possui-cadastro')
+def possuiCadastro(message):
+    bot.send_message(message.message.chat.id, 'Informe seu CPF')
+    if cpfFunctions.verificaCpf(message.message.text):
+        bot.register_next_step_handler(message.message, sistema_de_triagem)
 
 @bot.message_handler(commands=['triagem'])
-def question(message):
+def sistema_de_triagem(message):
     markup = types.InlineKeyboardMarkup(row_width=2)
 
     quest_1 = types.InlineKeyboardButton('Pronto Atendimento / Triagem', callback_data='prefix:pronto-atendimento')
@@ -31,25 +41,9 @@ def question(message):
 
     bot.send_message(message.chat.id, 'Escolha uma opção:', reply_markup=markup)
 
-
-@bot.callback_query_handler(func=lambda call: call.data == 'prefix:possui-cadastro')
-def pegaCpf(callback):
-    bot.send_message(callback.message.chat.id, 'Informe seu CPF')
-
-
-@bot.message_handler(func=lambda message: re.match(pattern, message.text))
-def verifica_cpf(message):
-    verificado = cpfFunctions.verificaCpf(message.text)
-    if verificado:
-        bot.reply_to(message, 'CPF verificado com sucesso. Por favor, informe seu email:')
-        bot.register_next_step_handler(message, cpfFunctions.captura_email)
-    else:
-        bot.reply_to(message, 'CPF não encontrado. Por favor, verifique e tente novamente.')
-
-
 @bot.message_handler(func=lambda message: True)
 def fallback_message(message):
-    bot.reply_to(message, 'Desculpe, não entendi sua mensagem. Tente usar os comandos disponíveis.')
+    bot.reply_to(message, 'Desculpe, não entendi sua mensagem. Tente usar os comandos disponíveis.\n /iniciar ou /triagem ')
 
 
 if __name__ == "__main__":
