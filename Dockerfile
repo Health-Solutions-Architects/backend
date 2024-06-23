@@ -1,4 +1,6 @@
-FROM python:3.11-alpine as ws-api
+
+# docker build --target backend --no-cache -t tecinforibeiro/health_solutions_architects:backend .
+FROM python:3.10 as backend
 
 ENV PYTHONUNBUFFERED=1
 
@@ -12,4 +14,4 @@ ENV PYTHONPATH=$PYTHONPATH:/app
 
 EXPOSE 6000
 
-CMD ["uvicorn", "src.api.app:app", "--no-server-header", "--workers", "2", "--host", "0.0.0.0", "--port", "5000"]
+CMD ["uvicorn", "src.app:app", "--no-server-header", "--host", "0.0.0.0", "--port", "5000"]

@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import Column, BigInteger, ForeignKey, Integer, String, DateTime
+from sqlalchemy.orm import relationship
 
 from src.database.database import Base
 
@@ -18,4 +19,7 @@ class FilaModel(Base):
     data_criacao = Column(DateTime, nullable=False, default=datetime.now)
 
     paciente_id = Column(BigInteger, ForeignKey('pacientes.id'), nullable=False)
+    paciente = relationship('PacienteModel')
+
     triagem_id = Column(BigInteger, ForeignKey('triagens.id'), nullable=False)
+

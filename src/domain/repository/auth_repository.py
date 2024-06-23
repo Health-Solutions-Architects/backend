@@ -13,3 +13,4 @@ class AuthRepository:
 
     def find(self, email: str) -> Type[UsuarioModel]:
         return self.session.query(UsuarioModel).filter_by(email=email).first()
+

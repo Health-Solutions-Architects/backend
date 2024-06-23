@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, BigInteger, ForeignKey, Date, String, Double, DateTime
+from sqlalchemy import Column, BigInteger, ForeignKey, Date, String, Double, DateTime, Integer
 
 from src.database.database import Base
 
@@ -10,20 +10,23 @@ class TriagemModel(Base):
 
     id = Column(BigInteger, primary_key=True, autoincrement=True)
 
-    cpf = Column(String, nullable=False)
-    nome = Column(String, nullable=False)
-    data_nascimento = Column(Date, nullable=False)
-    sexo = Column(String, nullable=False)
+    cpf = Column(String)
+    nome = Column(String)
+    data_nascimento = Column(Date)
+    sexo = Column(String)
 
-    peso = Column(Double, nullable=False)
-    altura = Column(Double, nullable=False)
+    peso = Column(String)
+    altura = Column(String)
 
-    oximetria = Column(String, nullable=False)
-    pressao = Column(String, nullable=False)
-    temperatura = Column(Double, nullable=False)
-    parecer_tecnico = Column(String, nullable=False)
+    oximetria = Column(String)
+    pressao = Column(String)
+    temperatura = Column(String)
 
-    data_criacao = Column(DateTime, nullable=False, default=datetime.now)
+    parecer_tecnico = Column(String)
+    nivel_risco = Column(Integer)
+    nivel_prioridade = Column(Integer)
 
-    paciente_id = Column(BigInteger, ForeignKey('pacientes.id'), nullable=False)
-    funcionario_id = Column(BigInteger, ForeignKey('funcionarios.id'), nullable=False)
+    data_criacao = Column(DateTime, default=datetime.now)
+
+    paciente_id = Column(BigInteger, ForeignKey('pacientes.id'))
+    funcionario_id = Column(BigInteger, ForeignKey('funcionarios.id'))

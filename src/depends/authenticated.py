@@ -1,12 +1,21 @@
 from fastapi.requests import Request
 from fastapi.security import SecurityScopes
+from pydantic import BaseModel
 
+from src.depends.jwt_provider import DependsJwtProvider
 from src.exceptions import HTTPExceptionUnauthorized
 
 
-def authenticated_user(request: Request, security_scopes: SecurityScopes):
-    session = request.cookies.get('session')
+class AuthSession(BaseModel):
+    user_id: int
+    scopes: list[str]
+
+
+def authenticated_user(request: Request, security_scopes: SecurityScopes, jwt: DependsJwtProvider):
+    session = request.headers.get('x-auth')
     if not session:
         raise HTTPExceptionUnauthorized()
-    return dict(user_id=1)
 
+    jwt_payload = jwt.decode(token=session)
+
+    return jwt_payload

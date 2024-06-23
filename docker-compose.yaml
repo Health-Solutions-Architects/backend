@@ -4,6 +4,26 @@ networks:
 
 services:
 
+  service_api:
+    image: tecinforibeiro/health_solutions_architects:backend
+    container_name: service_api
+    privileged: true
+    user: root
+    ports:
+      - '5000:5000'
+    environment:
+      - POSTGRES_DATABASE_URL=postgresql://hackathon:hackathon@postgresql/hackathon
+      - JWT_SECRET_KEY=c225eb24faae7ef623d0ff5fd98378a0
+      - JWT_EXPIRATION=15
+      - JWT_ALGORITHMS=HS256
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=hackathon
+      - OPENAI_API_KEY=sk-proj-l3JERZWeu5Oel2MIt6WsT3BlbkFJB81s6juLJGtmywlB7z1j
+      - SESSION_KEY=session
+    networks:
+      - services-network
+
   postgresql:
     image: bitnami/postgresql:latest
     container_name: postgresql
@@ -35,23 +55,3 @@ services:
       - '6379:6379'
     networks:
       - services-network
-
-
-  rabbitmq:
-    image: bitnami/rabbitmq:latest
-    container_name: rabbitmq
-    restart: always
-    privileged: true
-    user: root
-    environment:
-      - RABBITMQ_MANAGEMENT_ALLOW_WEB_ACCESS=true
-      - RABBITMQ_USERNAME=admin
-      - RABBITMQ_PASSWORD=admin12345
-    ports:
-      - '15672:15672'
-      - '5672:5672'
-    volumes:
-      - ./docker_data/rabbitmq:/bitnami/rabbitmq/mnesia
-    networks:
-      - services-network
-
