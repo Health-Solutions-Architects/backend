@@ -1,14 +1,12 @@
-from passlib.context import CryptContext
+import bcrypt
 
 
 class PasswordProvider:
-    context: CryptContext
 
-    def __init__(self):
-        self.context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+    @staticmethod
+    def hash_password(password: str) -> str:
+        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode()
 
-    def hash_password(self, password: str) -> str:
-        return self.context.hash(password)
-
-    def verify_password(self, password: str, hashed_password: str) -> bool:
-        return self.context.verify(password, hashed_password)
+    @staticmethod
+    def verify_password(password: str, hashed_password: str) -> bool:
+        return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))

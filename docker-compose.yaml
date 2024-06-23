@@ -23,13 +23,13 @@ services:
 
 
   redis:
-    image: docker.io/bitnami/redis:7.2
+    image: bitnami/redis:7.2
     container_name: redis
     restart: always
     privileged: true
     user: root
     environment:
-      - REDIS_PASSWORD=admin@12345
+      - REDIS_PASSWORD=hackathon
       - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
     ports:
       - '6379:6379'

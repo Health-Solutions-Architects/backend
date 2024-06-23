@@ -2,20 +2,24 @@ import contextlib
 
 import dotenv
 from fastapi import FastAPI
+from redis import Redis
 from starlette.middleware.cors import CORSMiddleware
 
 from src.config.app_settings import AppSettings
-from src.providers.password_provider import PasswordProvider
-from src.routes import auth
+from src.providers import JwtProvider
+from src.routes import auth, pre_triagem
 
 dotenv.load_dotenv()
 
 
 @contextlib.asynccontextmanager
 async def lifespan(_app: FastAPI):
+    settings = AppSettings()
+    cache = Redis(host=settings.redis_host, port=settings.redis_port, password=settings.redis_password)
     yield dict(
-        settings=AppSettings(),
-        password_provider=PasswordProvider(),
+        settings=settings,
+        jwt_provider=JwtProvider(secret=settings.jwt_secret_key),
+        redis=cache
     )
 
 
@@ -34,4 +38,11 @@ app.add_middleware(
     allow_headers=['*'],
 )
 
+
+@app.get('/')
+def index():
+    return {'hello': 'world'}
+
+
 app.include_router(prefix='/api', tags=['api'], router=auth.router)
+app.include_router(prefix='/api', tags=['api'], router=pre_triagem.router)

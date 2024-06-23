@@ -8,6 +8,12 @@ T = TypeVar("T")
 class HttpResponse:
 
     @classmethod
+    def cookies(cls, key: str, value: T, status_code: int = 200, data: T = None):
+        response = ORJSONResponse(status_code=status_code, content=data)
+        response.set_cookie(key, value)
+        return response
+
+    @classmethod
     def create(cls, status_code: int, data: T):
         return ORJSONResponse(status_code=status_code, content=data)
 
