@@ -4,6 +4,33 @@ networks:
 
 services:
 
+  proxy_manager:
+    image: 'docker.io/jc21/nginx-proxy-manager:latest'
+    container_name: proxymanager
+    restart: always
+    privileged: true
+    user: root
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    volumes:
+      - ./docker_data/proxy/data:/data
+      - ./docker_data/proxy/letsencrypt:/etc/letsencrypt
+    networks:
+      - services-network
+
+  service_front:
+    image: tecinforibeiro/health_solutions_architects:frontend
+    container_name: service_front
+    privileged: true
+    user: root
+    ports:
+      - '3000:80'
+    networks:
+      - services-network
+
+
   service_api:
     image: tecinforibeiro/health_solutions_architects:backend
     container_name: service_api
@@ -24,6 +51,7 @@ services:
     networks:
       - services-network
 
+
   postgresql:
     image: bitnami/postgresql:latest
     container_name: postgresql
@@ -37,7 +65,7 @@ services:
     volumes:
       - ./docker_data/postgresql:/bitnami/postgresql
     ports:
-      - '5432:5432'
+      - '9000:5432'
     networks:
       - services-network
 
@@ -52,6 +80,6 @@ services:
       - REDIS_PASSWORD=hackathon
       - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
     ports:
-      - '6379:6379'
+      - '8000:6379'
     networks:
       - services-network
