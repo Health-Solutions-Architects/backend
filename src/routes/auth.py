@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 from fastapi.params import Security
 from fastapi.requests import Request
-from fastapi.responses import ORJSONResponse
 
 from src.depends import (
     DatabaseSession, DependsAppSettings, DependsJwtProvider, authenticated_user
@@ -34,13 +33,13 @@ def post_auth_login(request: Request,
 
     user_jwt = jwt_provider.encode(jwt_payload)
 
-    return ORJSONResponse({'message': 'Usuario autentica com sucesso!',
-                               'data': {'user': jwt_payload, 'session': user_jwt}})
+    return HttpResponse.ok(data={'message': 'Usuario autentica com sucesso!',
+                                 'data': {'user': jwt_payload, 'session': user_jwt}})
 
 
 @router.get('/auth/logout')
 def get_auth_logout(settings: DependsAppSettings):
-    response = ORJSONResponse(content={'message': 'Deslogado com sucesso!'})
+    response = HttpResponse.ok(data={'message': 'Deslogado com sucesso!'})
     response.delete_cookie(settings.session_key)
     return response
 

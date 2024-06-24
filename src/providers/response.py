@@ -1,6 +1,7 @@
 from typing import TypeVar
 
-from fastapi.responses import ORJSONResponse
+import orjson
+from starlette.responses import Response
 
 T = TypeVar("T")
 
@@ -9,20 +10,26 @@ class HttpResponse:
 
     @classmethod
     def create(cls, status_code: int, data: T):
-        return ORJSONResponse(status_code=status_code, content=data)
+        return Response(content=orjson.dumps(data, default=str).decode(), media_type="application/json",
+                        status_code=status_code)
 
     @classmethod
     def message(cls, status_code: int, message: str):
-        return ORJSONResponse(status_code=status_code, content={"message": message})
+        data = {'message': message}
+        return Response(content=orjson.dumps(data, default=str).decode(), media_type="application/json",
+                        status_code=status_code)
 
     @classmethod
     def ok(cls, data: T):
-        return ORJSONResponse(status_code=200, content=data)
+        return Response(content=orjson.dumps(data, default=str).decode(), media_type="application/json",
+                        status_code=200)
 
     @classmethod
     def unauthorized(cls, data: T):
-        return ORJSONResponse(status_code=401, content=data)
+        return Response(content=orjson.dumps(data, default=str).decode(), media_type="application/json",
+                        status_code=401)
 
     @classmethod
     def not_found(cls, data: T = None):
-        return ORJSONResponse(status_code=404, content=data)
+        return Response(content=orjson.dumps(data, default=str).decode(), media_type="application/json",
+                        status_code=404)

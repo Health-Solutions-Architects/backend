@@ -3,13 +3,15 @@ import contextlib
 import dotenv
 from fastapi import FastAPI
 from fastapi.requests import Request
-from jwt import ExpiredSignatureError, DecodeError
+from jwt import DecodeError, ExpiredSignatureError
 from redis import Redis
+from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
+from starlette.responses import Response, JSONResponse
 
 from src.config.app_settings import AppSettings
 from src.providers import JwtProvider, HttpResponse
-from src.routes import auth, pre_triagem, fila, triagem
+from src.routes import auth, pre_triagem, triagem, fila
 
 dotenv.load_dotenv()
 
@@ -27,25 +29,47 @@ async def lifespan(_app: FastAPI):
     )
 
 
+middleware = [
+    Middleware(
+        CORSMiddleware,
+        allow_origins=['*'],
+        allow_credentials=True,
+        allow_methods=['*'],
+        allow_headers=['*']
+    )
+]
+
 app = FastAPI(
     redoc_url=None,
     docs_url=None,
     openapi_url=None,
-    lifespan=lifespan
+    lifespan=lifespan,
+    middleware=middleware
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=['*'],
-    allow_credentials=True,
-    allow_methods=['*'],
-    allow_headers=['*'],
-)
+
+def write_response(request: Request, response: Response):
+    origin = request.headers.get('origin', request.headers.get('Origin', '*'))
+    response.headers['Access-Control-Allow-Origin'] = origin
+    response.headers['Access-Control-Allow-Methods'] = 'DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT'
+    response.headers[
+        'Access-Control-Allow-Headers'] = 'Authorization, Accept, Accept-Language, Content-Language, Content-Type, x-auth'
+
+
+@app.middleware("http")
+async def add_cors_middleware(request: Request, call_next):
+    response = await call_next(request)
+    if request.method == 'OPTIONS':
+        response = Response(status_code=200)
+        write_response(request, response)
+        return response
+    write_response(request, response)
+    return response
 
 
 @app.get('/')
 def index():
-    return {'hello': 'world'}
+    return JSONResponse(content={'ok': True})
 
 
 app.include_router(prefix='/api', tags=['api'], router=auth.router)

@@ -4,54 +4,6 @@ networks:
 
 services:
 
-  proxy_manager:
-    image: 'docker.io/jc21/nginx-proxy-manager:latest'
-    container_name: proxymanager
-    restart: always
-    privileged: true
-    user: root
-    ports:
-      - '80:80'
-      - '81:81'
-      - '443:443'
-    volumes:
-      - ./docker_data/proxy/data:/data
-      - ./docker_data/proxy/letsencrypt:/etc/letsencrypt
-    networks:
-      - services-network
-
-  service_front:
-    image: tecinforibeiro/health_solutions_architects:frontend
-    container_name: service_front
-    privileged: true
-    user: root
-    ports:
-      - '3000:80'
-    networks:
-      - services-network
-
-
-  service_api:
-    image: tecinforibeiro/health_solutions_architects:backend
-    container_name: service_api
-    privileged: true
-    user: root
-    ports:
-      - '5000:5000'
-    environment:
-      - POSTGRES_DATABASE_URL=postgresql://hackathon:hackathon@postgresql/hackathon
-      - JWT_SECRET_KEY=c225eb24faae7ef623d0ff5fd98378a0
-      - JWT_EXPIRATION=15
-      - JWT_ALGORITHMS=HS256
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=hackathon
-      - OPENAI_API_KEY=sk-proj-l3JERZWeu5Oel2MIt6WsT3BlbkFJB81s6juLJGtmywlB7z1j
-      - SESSION_KEY=session
-    networks:
-      - services-network
-
-
   postgresql:
     image: bitnami/postgresql:latest
     container_name: postgresql
@@ -65,7 +17,7 @@ services:
     volumes:
       - ./docker_data/postgresql:/bitnami/postgresql
     ports:
-      - '9000:5432'
+      - '5432:5432'
     networks:
       - services-network
 
@@ -80,6 +32,6 @@ services:
       - REDIS_PASSWORD=hackathon
       - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
     ports:
-      - '8000:6379'
+      - '6379:6379'
     networks:
       - services-network
